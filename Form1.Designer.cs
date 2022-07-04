@@ -35,6 +35,8 @@ namespace EMGU_Example
             this.btnStop = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label8 = new System.Windows.Forms.Label();
+            this.cbCamera = new System.Windows.Forms.ComboBox();
             this.lblDetected = new System.Windows.Forms.Label();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.btnRecoverSetting = new System.Windows.Forms.Button();
@@ -56,6 +58,7 @@ namespace EMGU_Example
             this.txtTGToken = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.folderBrowserDlg = new System.Windows.Forms.FolderBrowserDialog();
+            this.lblDiff = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -105,6 +108,9 @@ namespace EMGU_Example
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.lblDiff);
+            this.tabPage1.Controls.Add(this.label8);
+            this.tabPage1.Controls.Add(this.cbCamera);
             this.tabPage1.Controls.Add(this.lblDetected);
             this.tabPage1.Controls.Add(this.picOutput);
             this.tabPage1.Controls.Add(this.btnStop);
@@ -117,14 +123,31 @@ namespace EMGU_Example
             this.tabPage1.Text = "即時影像";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(263, 498);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(49, 12);
+            this.label8.TabIndex = 5;
+            this.label8.Text = "Webcam:";
+            // 
+            // cbCamera
+            // 
+            this.cbCamera.FormattingEnabled = true;
+            this.cbCamera.Location = new System.Drawing.Point(318, 493);
+            this.cbCamera.Name = "cbCamera";
+            this.cbCamera.Size = new System.Drawing.Size(121, 20);
+            this.cbCamera.TabIndex = 4;
+            // 
             // lblDetected
             // 
             this.lblDetected.AutoSize = true;
             this.lblDetected.Location = new System.Drawing.Point(17, 498);
             this.lblDetected.Name = "lblDetected";
-            this.lblDetected.Size = new System.Drawing.Size(35, 12);
+            this.lblDetected.Size = new System.Drawing.Size(71, 12);
             this.lblDetected.TabIndex = 3;
-            this.lblDetected.Text = "狀態: ";
+            this.lblDetected.Text = "已偵測次數: ";
             // 
             // tabPage2
             // 
@@ -310,6 +333,15 @@ namespace EMGU_Example
             this.label1.TabIndex = 0;
             this.label1.Text = "Telegram Token:";
             // 
+            // lblDiff
+            // 
+            this.lblDiff.AutoSize = true;
+            this.lblDiff.Location = new System.Drawing.Point(144, 498);
+            this.lblDiff.Name = "lblDiff";
+            this.lblDiff.Size = new System.Drawing.Size(47, 12);
+            this.lblDiff.TabIndex = 6;
+            this.lblDiff.Text = "Diff(%): ";
+            // 
             // DetectBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -320,6 +352,7 @@ namespace EMGU_Example
             this.Name = "DetectBot";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Movement Detection Bot";
+            this.Load += new System.EventHandler(this.DetectBot_Load);
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
@@ -361,6 +394,9 @@ namespace EMGU_Example
         private System.Windows.Forms.FolderBrowserDialog folderBrowserDlg;
         private System.Windows.Forms.Label lblDetected;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.ComboBox cbCamera;
+        private System.Windows.Forms.Label lblDiff;
     }
 }
 

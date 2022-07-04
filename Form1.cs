@@ -20,6 +20,7 @@ namespace EMGU_Example
     {
         private VideoCapture _capture = null;
         private Mat _frame;
+        private int _detect_times = 0;
 
         Image<Bgr, Byte> Current_Frame_RGB; //current Frame from camera (The raw image)
 
@@ -40,12 +41,34 @@ namespace EMGU_Example
             loadSettingToUI();
         }
 
+        private void DetectBot_Load(object sender, EventArgs e)
+        {
+            int i = 0;
+            while(true)
+            {
+                _capture = new VideoCapture(i);
+                if(_capture.IsOpened)
+                {
+                    cbCamera.Items.Insert(i, "Camera " + i);
+                    i++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            cbCamera.SelectedIndex = 0;
+        }
+
         private void btnCapture_Click(object sender, EventArgs e)
         {
-            _capture = new VideoCapture(0);
+            _capture = new VideoCapture(cbCamera.SelectedIndex);
+
             _capture.ImageGrabbed += ProcessFrame;
             _frame = new Mat();
             _framecount = 0;
+
+            _detect_times = 0;
 
             Difference = new Image<Gray, byte>(picOutput.Width, picOutput.Height);
 
@@ -75,12 +98,19 @@ namespace EMGU_Example
                         diff = (diff / (Current_Frame.Width * Current_Frame.Height)) * 100;
                         Debug.WriteLine($"Diff: {diff}%\r\n");
 
+                        this.Invoke((MethodInvoker)delegate
+                        {
+                            lblDiff.Text = "Diff(%): " + diff.ToString("F2");
+                        });
+
                         // Send image to the telegram if the diff value is exceeded threshold.
                         if (diff >= iniSetting.LowerBound && diff <= iniSetting.UpperBound)
                         {
+                            _detect_times++;
+
                             this.Invoke((MethodInvoker)delegate
                             {
-                                lblDetected.Text = "狀態: 偵測到移動";
+                                lblDetected.Text = "已偵測次數: " + _detect_times;
                             });
                             
                             string path = iniSetting.SaveFolder + "\\" + DateTime.Now.ToString("yyyy-MM-dd_HHmmssff") + ".jpg";
@@ -92,11 +122,6 @@ namespace EMGU_Example
                     Previous_Frame = Current_Frame.Copy();                  
                     _framecount = 0;
                 }
-
-                this.Invoke((MethodInvoker)delegate
-                {
-                    lblDetected.Text = "狀態:無移動";
-                });
 
                 _framecount++;
             }
@@ -171,5 +196,7 @@ namespace EMGU_Example
             loadSettingToUI();
             MessageBox.Show("完成", "訊息", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
+
+
     }
 }

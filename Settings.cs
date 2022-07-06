@@ -13,6 +13,7 @@ namespace EMGU_Example
 
         protected string SECNAME_TG = "TGInfo";
         public string TGtoken;
+        public string TGSendToGroup;
         public string TGchatID;
 
         protected string SECNAME_IMG = "ImgInfo";
@@ -34,6 +35,7 @@ namespace EMGU_Example
                 {
                     sw.WriteLine("[" + SECNAME_TG + "]");
                     sw.WriteLine("token=");
+                    sw.WriteLine("send_to_group=1");
                     sw.WriteLine("chatid=");
                     sw.WriteLine("[" + SECNAME_IMG + "]");
                     sw.WriteLine("upper_bound=100");
@@ -49,6 +51,7 @@ namespace EMGU_Example
         public void writeAll()
         {
             _iniReader.WriteValue(SECNAME_TG, "token", TGtoken);
+            _iniReader.WriteValue(SECNAME_TG, "send_to_group", TGSendToGroup);
             _iniReader.WriteValue(SECNAME_TG, "chatid", TGchatID);
             _iniReader.WriteValue(SECNAME_IMG, "upper_bound", UpperBound.ToString());
             _iniReader.WriteValue(SECNAME_IMG, "lower_bound", LowerBound.ToString());
@@ -59,6 +62,7 @@ namespace EMGU_Example
         public void readAll()
         {           
             TGtoken = _iniReader.ReadValue(SECNAME_TG, "token");
+            TGSendToGroup = _iniReader.ReadValue(SECNAME_TG, "send_to_group");
             TGchatID = _iniReader.ReadValue(SECNAME_TG, "chatid");
             UpperBound = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "upper_bound"));
             LowerBound = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "lower_bound"));

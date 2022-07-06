@@ -29,12 +29,14 @@ namespace EMGU_Example
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DetectBot));
             this.picOutput = new System.Windows.Forms.PictureBox();
             this.btnCapture = new System.Windows.Forms.Button();
             this.btnStop = new System.Windows.Forms.Button();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.lblDiff = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.cbCamera = new System.Windows.Forms.ComboBox();
             this.lblDetected = new System.Windows.Forms.Label();
@@ -58,7 +60,8 @@ namespace EMGU_Example
             this.txtTGToken = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.folderBrowserDlg = new System.Windows.Forms.FolderBrowserDialog();
-            this.lblDiff = new System.Windows.Forms.Label();
+            this.chkSendToGroup = new System.Windows.Forms.CheckBox();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
@@ -122,6 +125,15 @@ namespace EMGU_Example
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "即時影像";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // lblDiff
+            // 
+            this.lblDiff.AutoSize = true;
+            this.lblDiff.Location = new System.Drawing.Point(144, 498);
+            this.lblDiff.Name = "lblDiff";
+            this.lblDiff.Size = new System.Drawing.Size(47, 12);
+            this.lblDiff.TabIndex = 6;
+            this.lblDiff.Text = "Diff(%): ";
             // 
             // label8
             // 
@@ -195,7 +207,7 @@ namespace EMGU_Example
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.txtLowerBound);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(6, 120);
+            this.groupBox2.Location = new System.Drawing.Point(6, 149);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(628, 130);
             this.groupBox2.TabIndex = 1;
@@ -290,32 +302,33 @@ namespace EMGU_Example
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkSendToGroup);
             this.groupBox1.Controls.Add(this.txtTGChatID);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.txtTGToken);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(628, 107);
+            this.groupBox1.Size = new System.Drawing.Size(628, 127);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Telegram Bot設定";
             // 
             // txtTGChatID
             // 
-            this.txtTGChatID.Location = new System.Drawing.Point(111, 63);
+            this.txtTGChatID.Location = new System.Drawing.Point(138, 86);
             this.txtTGChatID.Name = "txtTGChatID";
-            this.txtTGChatID.Size = new System.Drawing.Size(494, 22);
+            this.txtTGChatID.Size = new System.Drawing.Size(467, 22);
             this.txtTGChatID.TabIndex = 3;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(19, 73);
+            this.label2.Location = new System.Drawing.Point(44, 96);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(89, 12);
+            this.label2.Size = new System.Drawing.Size(78, 12);
             this.label2.TabIndex = 2;
-            this.label2.Text = "Telegram ChatID:";
+            this.label2.Text = "Group Chat ID:";
             // 
             // txtTGToken
             // 
@@ -329,25 +342,34 @@ namespace EMGU_Example
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(17, 37);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 12);
+            this.label1.Size = new System.Drawing.Size(58, 12);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Telegram Token:";
+            this.label1.Text = "Bot Token:";
             // 
-            // lblDiff
+            // chkSendToGroup
             // 
-            this.lblDiff.AutoSize = true;
-            this.lblDiff.Location = new System.Drawing.Point(144, 498);
-            this.lblDiff.Name = "lblDiff";
-            this.lblDiff.Size = new System.Drawing.Size(47, 12);
-            this.lblDiff.TabIndex = 6;
-            this.lblDiff.Text = "Diff(%): ";
+            this.chkSendToGroup.AutoSize = true;
+            this.chkSendToGroup.Location = new System.Drawing.Point(19, 65);
+            this.chkSendToGroup.Name = "chkSendToGroup";
+            this.chkSendToGroup.Size = new System.Drawing.Size(167, 16);
+            this.chkSendToGroup.TabIndex = 4;
+            this.chkSendToGroup.Text = "偵測通知發至Group聊天室?";
+            this.chkSendToGroup.UseVisualStyleBackColor = true;
+            this.chkSendToGroup.CheckedChanged += new System.EventHandler(this.chkSendToGroup_CheckedChanged);
+            this.chkSendToGroup.MouseHover += new System.EventHandler(this.chkSendToGroup_MouseHover);
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             // 
             // DetectBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Control;
             this.ClientSize = new System.Drawing.Size(668, 563);
             this.Controls.Add(this.tabControl1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "DetectBot";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -397,6 +419,8 @@ namespace EMGU_Example
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox cbCamera;
         private System.Windows.Forms.Label lblDiff;
+        private System.Windows.Forms.CheckBox chkSendToGroup;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 

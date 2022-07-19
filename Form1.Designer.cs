@@ -44,6 +44,7 @@ namespace EMGU_Example
             this.btnRecoverSetting = new System.Windows.Forms.Button();
             this.btnApplySetting = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.btnBrowserFolder = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
@@ -55,12 +56,14 @@ namespace EMGU_Example
             this.txtLowerBound = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.linkBotCreateTutorial = new System.Windows.Forms.LinkLabel();
+            this.label9 = new System.Windows.Forms.Label();
+            this.chkSendToGroup = new System.Windows.Forms.CheckBox();
             this.txtTGChatID = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.txtTGToken = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.folderBrowserDlg = new System.Windows.Forms.FolderBrowserDialog();
-            this.chkSendToGroup = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.picOutput)).BeginInit();
             this.tabControl1.SuspendLayout();
@@ -131,9 +134,9 @@ namespace EMGU_Example
             this.lblDiff.AutoSize = true;
             this.lblDiff.Location = new System.Drawing.Point(144, 498);
             this.lblDiff.Name = "lblDiff";
-            this.lblDiff.Size = new System.Drawing.Size(47, 12);
+            this.lblDiff.Size = new System.Drawing.Size(52, 12);
             this.lblDiff.TabIndex = 6;
-            this.lblDiff.Text = "Diff(%): ";
+            this.lblDiff.Text = "閾值(%): ";
             // 
             // label8
             // 
@@ -197,6 +200,7 @@ namespace EMGU_Example
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.btnBrowserFolder);
             this.groupBox2.Controls.Add(this.label6);
@@ -207,12 +211,23 @@ namespace EMGU_Example
             this.groupBox2.Controls.Add(this.label4);
             this.groupBox2.Controls.Add(this.txtLowerBound);
             this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Location = new System.Drawing.Point(6, 149);
+            this.groupBox2.Location = new System.Drawing.Point(6, 169);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(628, 130);
+            this.groupBox2.Size = new System.Drawing.Size(628, 149);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "影像相關";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label10.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.label10.Location = new System.Drawing.Point(47, 121);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(128, 12);
+            this.label10.TabIndex = 6;
+            this.label10.Text = "⚠ 請務必設置存圖路徑";
             // 
             // label7
             // 
@@ -225,7 +240,7 @@ namespace EMGU_Example
             // 
             // btnBrowserFolder
             // 
-            this.btnBrowserFolder.Location = new System.Drawing.Point(597, 92);
+            this.btnBrowserFolder.Location = new System.Drawing.Point(593, 92);
             this.btnBrowserFolder.Name = "btnBrowserFolder";
             this.btnBrowserFolder.Size = new System.Drawing.Size(25, 23);
             this.btnBrowserFolder.TabIndex = 8;
@@ -294,14 +309,16 @@ namespace EMGU_Example
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(34, 29);
+            this.label3.Location = new System.Drawing.Point(10, 29);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(68, 12);
+            this.label3.Size = new System.Drawing.Size(92, 12);
             this.label3.TabIndex = 0;
-            this.label3.Text = "觸發上下限:";
+            this.label3.Text = "觸發閾值上下限:";
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.linkBotCreateTutorial);
+            this.groupBox1.Controls.Add(this.label9);
             this.groupBox1.Controls.Add(this.chkSendToGroup);
             this.groupBox1.Controls.Add(this.txtTGChatID);
             this.groupBox1.Controls.Add(this.label2);
@@ -309,14 +326,48 @@ namespace EMGU_Example
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(6, 6);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(628, 127);
+            this.groupBox1.Size = new System.Drawing.Size(628, 157);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Telegram Bot設定";
             // 
+            // linkBotCreateTutorial
+            // 
+            this.linkBotCreateTutorial.AutoSize = true;
+            this.linkBotCreateTutorial.Location = new System.Drawing.Point(491, 35);
+            this.linkBotCreateTutorial.Name = "linkBotCreateTutorial";
+            this.linkBotCreateTutorial.Size = new System.Drawing.Size(127, 12);
+            this.linkBotCreateTutorial.TabIndex = 4;
+            this.linkBotCreateTutorial.TabStop = true;
+            this.linkBotCreateTutorial.Text = "Token如何取? 請點我👆";
+            this.linkBotCreateTutorial.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkBotCreateTutorial_LinkClicked);
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label9.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.label9.Location = new System.Drawing.Point(17, 131);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(470, 12);
+            this.label9.TabIndex = 5;
+            this.label9.Text = "⚠ 若取消, 則會發送至您與BOT的對話視窗, 但請於Telegram發送 HI 喚醒BOT, 否則無作用";
+            // 
+            // chkSendToGroup
+            // 
+            this.chkSendToGroup.AutoSize = true;
+            this.chkSendToGroup.Location = new System.Drawing.Point(19, 74);
+            this.chkSendToGroup.Name = "chkSendToGroup";
+            this.chkSendToGroup.Size = new System.Drawing.Size(279, 16);
+            this.chkSendToGroup.TabIndex = 4;
+            this.chkSendToGroup.Text = "偵測通知發群組聊天室? (請先將BOT邀請至群組)";
+            this.chkSendToGroup.UseVisualStyleBackColor = true;
+            this.chkSendToGroup.CheckedChanged += new System.EventHandler(this.chkSendToGroup_CheckedChanged);
+            this.chkSendToGroup.MouseHover += new System.EventHandler(this.chkSendToGroup_MouseHover);
+            // 
             // txtTGChatID
             // 
-            this.txtTGChatID.Location = new System.Drawing.Point(138, 86);
+            this.txtTGChatID.Location = new System.Drawing.Point(138, 95);
             this.txtTGChatID.Name = "txtTGChatID";
             this.txtTGChatID.Size = new System.Drawing.Size(467, 22);
             this.txtTGChatID.TabIndex = 3;
@@ -324,7 +375,7 @@ namespace EMGU_Example
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(44, 96);
+            this.label2.Location = new System.Drawing.Point(44, 105);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(78, 12);
             this.label2.TabIndex = 2;
@@ -334,7 +385,7 @@ namespace EMGU_Example
             // 
             this.txtTGToken.Location = new System.Drawing.Point(111, 27);
             this.txtTGToken.Name = "txtTGToken";
-            this.txtTGToken.Size = new System.Drawing.Size(494, 22);
+            this.txtTGToken.Size = new System.Drawing.Size(368, 22);
             this.txtTGToken.TabIndex = 1;
             // 
             // label1
@@ -345,18 +396,6 @@ namespace EMGU_Example
             this.label1.Size = new System.Drawing.Size(58, 12);
             this.label1.TabIndex = 0;
             this.label1.Text = "Bot Token:";
-            // 
-            // chkSendToGroup
-            // 
-            this.chkSendToGroup.AutoSize = true;
-            this.chkSendToGroup.Location = new System.Drawing.Point(19, 65);
-            this.chkSendToGroup.Name = "chkSendToGroup";
-            this.chkSendToGroup.Size = new System.Drawing.Size(167, 16);
-            this.chkSendToGroup.TabIndex = 4;
-            this.chkSendToGroup.Text = "偵測通知發至Group聊天室?";
-            this.chkSendToGroup.UseVisualStyleBackColor = true;
-            this.chkSendToGroup.CheckedChanged += new System.EventHandler(this.chkSendToGroup_CheckedChanged);
-            this.chkSendToGroup.MouseHover += new System.EventHandler(this.chkSendToGroup_MouseHover);
             // 
             // toolTip1
             // 
@@ -421,6 +460,9 @@ namespace EMGU_Example
         private System.Windows.Forms.Label lblDiff;
         private System.Windows.Forms.CheckBox chkSendToGroup;
         private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.LinkLabel linkBotCreateTutorial;
+        private System.Windows.Forms.Label label10;
     }
 }
 

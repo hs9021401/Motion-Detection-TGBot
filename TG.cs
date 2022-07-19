@@ -18,26 +18,35 @@ namespace EMGU_Example
 {
     public class TG
     {
-        public delegate void OnComdRecvDel(string sCmd);
-        public event OnComdRecvDel OnCmdRecvEvt;
+        public delegate void OnSelCameraChanged(int nIdx);
+        public event OnSelCameraChanged OnSelCameraChangedEvt;
+
+        public delegate void OnThresholdChanged(string nLow, string nUp);
+        public event OnThresholdChanged OnThresholdChangedEvt;
 
         private string _token, _chatId, _botprivatechatId;
+        private Settings _setting;
         bool _bSentGroup;
         TelegramBotClient _botClient;
         TelegramBotClient _botClient_Listen;
         CancellationTokenSource _cts;
 
-        public TG(string token, string chatid, string sentGroup)
-        { 
-            _token = token;
-            _chatId = chatid;
+        DetectBot _form = null;
+        
+
+        public TG(DetectBot form, Settings setting)
+        {
+            _form = form;
+            _setting = setting;
+            _token = _setting.TGtoken;
+            _chatId = _setting.TGchatID;
             _botClient = new TelegramBotClient(_token);
             _botClient_Listen = new TelegramBotClient(_token);
             _cts = new CancellationTokenSource();
             _botprivatechatId = getRobotPrivateChatId();
-            _bSentGroup = sentGroup.Equals("1") ? true : false;
+            _bSentGroup = _setting.TGSendToGroup.Equals("1") ? true : false;
 
-            Handlers.msgDele = OnCmdRecvHandler;
+            Handlers.msgDele = TgBot_CmdHandler;            
 
             var receiverOptions = new ReceiverOptions
             {
@@ -67,11 +76,6 @@ namespace EMGU_Example
             }
         }
 
-        public void OnCmdRecvHandler(string msg)
-        {
-            OnCmdRecvEvt.Invoke(msg);         
-        }
-
         public void robotMessage(string v)
         {
             if (_botprivatechatId.Equals(""))
@@ -88,7 +92,7 @@ namespace EMGU_Example
         public void robotSendMenu()
         {
             ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(new KeyboardButton[] {
-                "🖐HI", "📷DEVS", "🤔STATE","🔛ON", "❎OFF"
+                "🖐HI", "📷DEVS" ,"🤔STATE","🔛ON", "❎OFF", "THR"
             });
             replyKeyboardMarkup.ResizeKeyboard = true;
 
@@ -117,6 +121,93 @@ namespace EMGU_Example
             }
 
             return chatId;
+        }
+
+        private void TgBot_CmdHandler(string sCmd)
+        {
+            if (this._form.InvokeRequired)
+            {
+                Action<string> bAct = new Action<string>(TgBot_CmdHandler);
+                this._form.Invoke(bAct, sCmd);
+            }
+            else
+            {
+                sCmd = sCmd.ToUpper();
+                if (sCmd.Contains("ON"))
+                {
+                    robotMessage("開始偵測");
+                    this._form.btnCapture_Click(null, null);
+                }
+                else if (sCmd.Contains("OFF"))
+                {
+                    robotMessage("停止偵測");
+                    this._form.btnStop_Click(null, null);
+                }
+                else if (sCmd.Contains("HI"))
+                {
+                    robotMessage("HELLO 歡迎使用");
+                    robotSendMenu();
+                }
+                else if (sCmd.Contains("DEVS"))
+                {
+                    robotMessage("Camera共有: " + this._form.nCameraCount + "台, 請輸入SEL加數字\\(從0開始\\)選擇您要的裝置, 如SEL0");
+                }
+                else if (sCmd.Contains("STATE"))
+                {
+                    robotMessage("偵測中: " + (this._form._IsCapturing ? "是" : "否"));
+                }
+                else if (sCmd.Contains("SEL"))
+                {
+                    int selectCamera = Int32.Parse(sCmd.Replace("SEL", "").Trim());
+                    if (selectCamera >= this._form.nCameraCount || selectCamera < 0)
+                    {
+                        robotMessage("❌輸入錯誤請修正");
+                        return;
+                    }                    
+                    OnSelCameraChangedEvt(selectCamera);
+                    robotMessage("切換Camera" + selectCamera + "成功");
+                }
+                else if (sCmd.Contains("THR"))
+                {
+                    string sThreshold = sCmd.Replace("THR", "");
+
+                    if (sThreshold.Equals(""))
+                    {
+                        robotMessage("⁉設置偵測閾值上下限方式如右➡ THR85:100");
+                        return;
+                    }
+                    else
+                    {
+                        string lower = sThreshold.Split(':')[0];
+                        string upper = sThreshold.Split(':')[1];
+
+                        int nLower, nUpper;
+                        if (Int32.TryParse(lower, out nLower) && Int32.TryParse(upper, out nUpper))
+                        {
+                            //No need to be changed
+                            if (_setting.UpperBound == nUpper && _setting.LowerBound == nLower)
+                                return;
+
+                            //txtLowerBound.Text = lower;
+                            //txtUpperBound.Text = upper;
+
+                            OnThresholdChangedEvt(lower, upper);
+                            robotMessage("✅設置偵測閾值成功");
+                            Thread.Sleep(2000);
+                            this._form.btnApplySetting_Click(null, null);
+                        }
+                        else
+                        {
+                            robotMessage("❌輸入錯誤請修正");
+                        }
+                    }
+
+                }
+                else
+                {
+                    robotMessage("Q Q 我不懂你的明白");
+                }
+            }
         }
     }
 
@@ -163,6 +254,7 @@ namespace EMGU_Example
     }
 
 
+    #region Transform JSON format to Class with https://json2csharp.com/
     public class Chat
     {
         public int id { get; set; }
@@ -200,4 +292,5 @@ namespace EMGU_Example
         public bool ok { get; set; }
         public List<Result> result { get; set; }
     }
+    #endregion
 }

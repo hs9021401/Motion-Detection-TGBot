@@ -59,6 +59,11 @@ namespace EMGU_Example
                   cancellationToken: _cts.Token);
         }
 
+        public void StopTGBotReceiving()
+        {
+            _cts.Cancel();
+        }
+
         public async Task<Telegram.Bot.Types.Message> SendImgAsync(string path)
         {
             string[] timestamp = path.Split('\\');

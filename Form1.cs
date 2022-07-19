@@ -77,14 +77,16 @@ namespace EMGU_Example
 
 
         private void initTGBot()
-        { 
-            if(tgBot == null)
+        {
+            if (tgBot != null)
             {
-                tgBot = new TG(this, iniSetting);
-                tgBot.OnSelCameraChangedEvt += ChangeSelectedCameraHandler;
-                tgBot.OnThresholdChangedEvt += ChangeThresholdHandler;
-            }
-        
+                tgBot.StopTGBotReceiving();
+                tgBot = null;
+            }    
+
+            tgBot = new TG(this, iniSetting);
+            tgBot.OnSelCameraChangedEvt += ChangeSelectedCameraHandler;
+            tgBot.OnThresholdChangedEvt += ChangeThresholdHandler;
         }
 
         public bool checkIniSetting()
@@ -256,9 +258,6 @@ namespace EMGU_Example
                 }
             }
 
-            if (!checkIniSetting())
-                return;
-
             iniSetting.TGtoken = txtTGToken.Text;
             iniSetting.TGSendToGroup = chkSendToGroup.Checked ? "1" : "0";
             iniSetting.TGchatID = txtTGChatID.Text;
@@ -266,6 +265,10 @@ namespace EMGU_Example
             iniSetting.UpperBound = Int32.Parse(txtUpperBound.Text);
             iniSetting.FrameCount = Int32.Parse(txtFrameCount.Text);
             iniSetting.SaveFolder = txtSaveFolder.Text;
+
+            if (!checkIniSetting())
+                return;
+
             iniSetting.writeAll();
             iniSetting.readAll();   //reload ini setting
 

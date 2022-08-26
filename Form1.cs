@@ -14,6 +14,11 @@ using Telegram.Bot;
 using Telegram.Bot.Types.InputFiles;
 using Telegram.Bot.Types;
 using System.Threading;
+using Emgu.CV.Util;
+using Newtonsoft.Json.Linq;
+using Emgu.CV.CvEnum;
+using System.Security.Cryptography;
+using System.Xml.Linq;
 
 namespace EMGU_Example
 {
@@ -25,12 +30,15 @@ namespace EMGU_Example
         private TG tgBot;
         public bool _IsCapturing;
         public int nCameraCount = 0;
+        private int _frameArea = 0;
 
         #region CV Image declare
         Image<Bgr, Byte> Current_Frame_RGB; //current Frame from camera (The raw image)        
-        Image<Gray, Byte> Current_Frame; //current Frame from camera (gray)
-        Image<Gray, Byte> Previous_Frame; //Previiousframe aquired
-        Image<Gray, Byte> Difference; //Difference between the two frames        
+        Image<Bgr, Byte> Current_Frame_RGB_Processed; //current Frame from camera (The raw image)        
+
+        Image<Gray, Byte> Gray_Frame; //current Frame from camera (gray)
+        Image<Bgr, Byte> Previous_Frame; //Previiousframe aquired
+        Image<Bgr, Byte> Difference; //Difference between the two frames        
         #endregion
         private int _framecount;
         
@@ -120,10 +128,9 @@ namespace EMGU_Example
             cbCamera.SelectedIndex = nIdx;
         }
 
-        private void ChangeThresholdHandler(string sLower, string sUpper)
+        private void ChangeThresholdHandler(string sLower)
         {
             txtLowerBound.Text = sLower;
-            txtUpperBound.Text = sUpper;
         }
 
         public void btnCapture_Click(object sender, EventArgs e)
@@ -140,10 +147,11 @@ namespace EMGU_Example
             _capture.ImageGrabbed += ProcessFrame;
             _frame = new Mat();
             _framecount = 0;
+            _frameArea = picOutput.Width * picOutput.Height;
 
             _detect_times = 0;
 
-            Difference = new Image<Gray, byte>(picOutput.Width, picOutput.Height);
+            Difference = new Image<Bgr, byte>(picOutput.Width, picOutput.Height);
 
             if (_capture != null)
                 _capture.Start();
@@ -151,55 +159,112 @@ namespace EMGU_Example
             _IsCapturing = true;
         }
 
+        /// <summary>
+        /// 使用Canny邊緣檢測演算法, 依照觸發數值, 於原圖像框出符合觸發條件的矩形, 並傳送圖片給Telegram Bot
+        /// </summary>
+        /// <param name="GrayImage">經差異+灰階+二值處理的圖像</param>
+        /// <param name="DrawImage">原圖像</param>
+        private void DrawBoundingBoxAndAlert(Image<Gray, byte> GrayImage, Image<Bgr, byte> DrawImage)
+        {
+            Image<Gray, byte> CannyImage = GrayImage.Clone();
+            CvInvoke.Canny(GrayImage, CannyImage, 255, 255, 5, true);
+
+            using (VectorOfVectorOfPoint contours = new VectorOfVectorOfPoint())
+            {
+                CvInvoke.FindContours(CannyImage, contours, null, RetrType.External, ChainApproxMethod.ChainApproxSimple);
+
+                int count = contours.Size;
+                int maxContIdx = -1;
+                double maxContArea = 0;
+                
+                //Find maximum area
+                for (int i = 0; i < count; i++)
+                {
+                    using (VectorOfPoint contour = contours[i])
+                    {
+                        double tmpArea = CvInvoke.ContourArea(contour);
+
+                        if (tmpArea < iniSetting.TriggerBound)
+                            continue;
+
+                        if (tmpArea > maxContArea)
+                        {
+                            maxContIdx = i;
+                            maxContArea = tmpArea;
+                        }
+                    }
+                }
+
+                //Draw rectangle
+                if(contours.Size != 0 && maxContIdx != -1)
+                {
+                    Rectangle BoundingBox = CvInvoke.BoundingRectangle(contours[maxContIdx]);
+                    CvInvoke.Rectangle(DrawImage, BoundingBox, new MCvScalar(255, 0, 255, 255), 3);
+                    
+                    _detect_times++;
+
+                    this.Invoke((MethodInvoker)delegate
+                    {
+                        lblDetected.Text = "已偵測次數: " + _detect_times;                        
+                    });
+
+                    string path = iniSetting.SaveFolder + "\\" + DateTime.Now.ToString("yyyy-MM-dd_HHmmssff") + ".jpg";
+                    CvInvoke.Imwrite(path, Current_Frame_RGB);
+
+                    //Send Image
+                    Task<Telegram.Bot.Types.Message> task = tgBot.SendImgAsync(path);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Callback function for processing each incoming frame.
+        /// </summary>
         private void ProcessFrame(object sender, EventArgs e)
         {
             if(_capture!=null && _capture.Ptr != IntPtr.Zero)
             {
                 _capture.Retrieve(_frame, 0);
-                Bitmap bmp = Emgu.CV.BitmapExtension.ToBitmap(_frame);
-                picOutput.Image = (Image)bmp.Clone();                
+
+                //原圖轉Image格式
+                Current_Frame_RGB = _frame.ToImage<Bgr, byte>();
+
+                Current_Frame_RGB_Processed = Current_Frame_RGB.Copy();
+
+                //濾波
+                CvInvoke.GaussianBlur(Current_Frame_RGB, Current_Frame_RGB_Processed, new Size(3, 3), 3);
+                CvInvoke.Blur(Current_Frame_RGB_Processed, Current_Frame_RGB_Processed, new Size(3, 3), new Point(-1, -1));
 
                 if (_framecount % iniSetting.FrameCount == 0)
                 {
-                    Current_Frame_RGB = _frame.ToImage<Bgr, byte>();
-                    Current_Frame = Current_Frame_RGB.Convert<Gray, byte>();
-
-                    // Calculate diff
                     if (Previous_Frame != null)
                     {
-                        CvInvoke.AbsDiff(Previous_Frame, Current_Frame, Difference);
+                        //差異
+                        CvInvoke.AbsDiff(Previous_Frame, Current_Frame_RGB_Processed, Difference);
 
-                        double diff = CvInvoke.CountNonZero(Difference);
-                        diff = (diff / (Current_Frame.Width * Current_Frame.Height)) * 100;
-                        Debug.WriteLine($"Diff: {diff}%\r\n");
+                        //灰化
+                        Gray_Frame = Difference.Convert<Gray, byte>();
 
-                        this.Invoke((MethodInvoker)delegate
-                        {
-                            lblDiff.Text = "Diff(%): " + diff.ToString("F2");
-                        });
+                        //二值化
+                        CvInvoke.Threshold(Gray_Frame, Gray_Frame, 30, 255, ThresholdType.BinaryInv);
 
-                        // Send image to the telegram if the diff value is exceeded threshold.
-                        if (diff >= iniSetting.LowerBound && diff <= iniSetting.UpperBound)
-                        {
-                            _detect_times++;
+                        //使用型態轉換函數去除雜訊:
+                        //MorphOp.Open為"開"運算, 進行先腐蝕後膨脹的操作, 消除物體外的雜訊
+                        //MorphOp.Close為"閉"運算, 進行先膨脹後腐蝕的操作, 填充物體內的黑洞
+                        Mat element = CvInvoke.GetStructuringElement(Emgu.CV.CvEnum.ElementShape.Cross, new Size(5, 5), new Point(-1, -1));
+                        CvInvoke.MorphologyEx(Gray_Frame, Gray_Frame, Emgu.CV.CvEnum.MorphOp.Open, element,  new Point(-1, -1), 2, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar(0, 0, 0));
+                        CvInvoke.MorphologyEx(Gray_Frame, Gray_Frame, Emgu.CV.CvEnum.MorphOp.Close, element, new Point(-1, -1), 2, Emgu.CV.CvEnum.BorderType.Default, new MCvScalar(0, 0, 0));
 
-                            this.Invoke((MethodInvoker)delegate
-                            {
-                                lblDetected.Text = "已偵測次數: " + _detect_times;
-                            });
-                            
-                            string path = iniSetting.SaveFolder + "\\" + DateTime.Now.ToString("yyyy-MM-dd_HHmmssff") + ".jpg";
-                            CvInvoke.Imwrite(path, Current_Frame_RGB);
 
-                            //Send Image
-                            Task<Telegram.Bot.Types.Message> task = tgBot.SendImgAsync(path);
-                        }
+                        //偵測邊緣,畫框,送訊息
+                        DrawBoundingBoxAndAlert(Gray_Frame, Current_Frame_RGB);
                     }
 
-                    Previous_Frame = Current_Frame.Copy();                  
+                    Previous_Frame = Current_Frame_RGB_Processed.Copy();
                     _framecount = 0;
                 }
 
+                picOutput.Image = Current_Frame_RGB.ToBitmap();
                 _framecount++;
             }
         }
@@ -235,15 +300,14 @@ namespace EMGU_Example
                 txtTGChatID.Enabled = false;
             }            
             txtTGChatID.Text = iniSetting.TGchatID;
-            txtLowerBound.Text = iniSetting.LowerBound.ToString();
-            txtUpperBound.Text = iniSetting.UpperBound.ToString();
+            txtLowerBound.Text = iniSetting.TriggerBound.ToString();            
             txtFrameCount.Text = iniSetting.FrameCount.ToString();
             txtSaveFolder.Text = iniSetting.SaveFolder;
         }
 
         internal void btnApplySetting_Click(object sender, EventArgs e)
         {
-            if (!txtLowerBound.Text.All(char.IsDigit) || !txtUpperBound.Text.All(char.IsDigit) || !txtFrameCount.Text.All(char.IsDigit))
+            if (!txtLowerBound.Text.All(char.IsDigit) || !txtFrameCount.Text.All(char.IsDigit))
             {
                 System.Windows.Forms.MessageBox.Show("請輸入數字", "錯誤", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
                 return;
@@ -261,8 +325,7 @@ namespace EMGU_Example
             iniSetting.TGtoken = txtTGToken.Text;
             iniSetting.TGSendToGroup = chkSendToGroup.Checked ? "1" : "0";
             iniSetting.TGchatID = txtTGChatID.Text;
-            iniSetting.LowerBound = Int32.Parse(txtLowerBound.Text);
-            iniSetting.UpperBound = Int32.Parse(txtUpperBound.Text);
+            iniSetting.TriggerBound = Int32.Parse(txtLowerBound.Text);
             iniSetting.FrameCount = Int32.Parse(txtFrameCount.Text);
             iniSetting.SaveFolder = txtSaveFolder.Text;
 

@@ -21,7 +21,7 @@ namespace EMGU_Example
         public delegate void OnSelCameraChanged(int nIdx);
         public event OnSelCameraChanged OnSelCameraChangedEvt;
 
-        public delegate void OnThresholdChanged(string nLow, string nUp);
+        public delegate void OnThresholdChanged(string nTrigger);
         public event OnThresholdChanged OnThresholdChangedEvt;
 
         private string _token, _chatId, _botprivatechatId;
@@ -70,6 +70,9 @@ namespace EMGU_Example
             string targetChatId = _bSentGroup ? _chatId : _botprivatechatId;
             string caption = "[" + timestamp[timestamp.Length - 1].Split('.')[0] + "] 偵測到移動!";
 
+            if (targetChatId == String.Empty)
+                return null;
+
             using (var stream = System.IO.File.OpenRead(path))
             {
                 InputOnlineFile file = new InputOnlineFile(stream);
@@ -97,7 +100,7 @@ namespace EMGU_Example
         public void robotSendMenu()
         {
             ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup(new KeyboardButton[] {
-                "🖐HI", "📷DEVS" ,"🤔STATE","🔛ON", "❎OFF", "THR"
+                "🖐HI", "📷DEVS" ,"🤔STATE","🔛ON", "❎OFF", "TRG"
             });
             replyKeyboardMarkup.ResizeKeyboard = true;
 
@@ -159,7 +162,7 @@ namespace EMGU_Example
                 }
                 else if (sCmd.Contains("STATE"))
                 {
-                    robotMessage("偵測中: " + (this._form._IsCapturing ? "是" : "否"));
+                    robotMessage("偵測中: " + (this._form._IsCapturing ? "是" : "否"));                    
                 }
                 else if (sCmd.Contains("SEL"))
                 {
@@ -172,32 +175,26 @@ namespace EMGU_Example
                     OnSelCameraChangedEvt(selectCamera);
                     robotMessage("切換Camera" + selectCamera + "成功");
                 }
-                else if (sCmd.Contains("THR"))
+                else if (sCmd.Contains("TRG"))
                 {
-                    string sThreshold = sCmd.Replace("THR", "");
+                    string sThreshold = sCmd.Replace("TRG", "");
 
                     if (sThreshold.Equals(""))
                     {
-                        robotMessage("⁉設置偵測閾值上下限方式如右➡ THR85:100");
+                        robotMessage("目前觸發值: " + _setting.TriggerBound + " 😄設置觸發值方式👉 TRG5000");
                         return;
                     }
                     else
                     {
-                        string lower = sThreshold.Split(':')[0];
-                        string upper = sThreshold.Split(':')[1];
-
-                        int nLower, nUpper;
-                        if (Int32.TryParse(lower, out nLower) && Int32.TryParse(upper, out nUpper))
+                        int nTrigger;
+                        if (Int32.TryParse(sThreshold, out nTrigger) )
                         {
                             //No need to be changed
-                            if (_setting.UpperBound == nUpper && _setting.LowerBound == nLower)
+                            if ( _setting.TriggerBound == nTrigger)
                                 return;
 
-                            //txtLowerBound.Text = lower;
-                            //txtUpperBound.Text = upper;
-
-                            OnThresholdChangedEvt(lower, upper);
-                            robotMessage("✅設置偵測閾值成功");
+                            OnThresholdChangedEvt(sThreshold);
+                            robotMessage("✅設置觸發值成功");
                             Thread.Sleep(2000);
                             this._form.btnApplySetting_Click(null, null);
                         }

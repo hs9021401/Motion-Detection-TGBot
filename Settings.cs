@@ -16,9 +16,8 @@ namespace EMGU_Example
         public string TGSendToGroup;
         public string TGchatID;
 
-        protected string SECNAME_IMG = "ImgInfo";
-        public int UpperBound;
-        public int LowerBound;
+        protected string SECNAME_IMG = "ImgInfo";        
+        public int TriggerBound;
         public int FrameCount;
         public string SaveFolder;
 
@@ -37,9 +36,8 @@ namespace EMGU_Example
                     sw.WriteLine("token=");
                     sw.WriteLine("send_to_group=1");
                     sw.WriteLine("chatid=");
-                    sw.WriteLine("[" + SECNAME_IMG + "]");
-                    sw.WriteLine("upper_bound=100");
-                    sw.WriteLine("lower_bound=80");
+                    sw.WriteLine("[" + SECNAME_IMG + "]");                    
+                    sw.WriteLine("trigger_bound=5000");
                     sw.WriteLine("framecount=100");
                     sw.WriteLine("folder=" + System.IO.Directory.GetCurrentDirectory() + "\\SaveImg");
                 }                                       
@@ -53,8 +51,7 @@ namespace EMGU_Example
             _iniReader.WriteValue(SECNAME_TG, "token", TGtoken);
             _iniReader.WriteValue(SECNAME_TG, "send_to_group", TGSendToGroup);
             _iniReader.WriteValue(SECNAME_TG, "chatid", TGchatID);
-            _iniReader.WriteValue(SECNAME_IMG, "upper_bound", UpperBound.ToString());
-            _iniReader.WriteValue(SECNAME_IMG, "lower_bound", LowerBound.ToString());
+            _iniReader.WriteValue(SECNAME_IMG, "trigger_bound", TriggerBound.ToString());
             _iniReader.WriteValue(SECNAME_IMG, "framecount", FrameCount.ToString());
             _iniReader.WriteValue(SECNAME_IMG, "folder", SaveFolder);
         }
@@ -64,8 +61,7 @@ namespace EMGU_Example
             TGtoken = _iniReader.ReadValue(SECNAME_TG, "token");
             TGSendToGroup = _iniReader.ReadValue(SECNAME_TG, "send_to_group");
             TGchatID = _iniReader.ReadValue(SECNAME_TG, "chatid");
-            UpperBound = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "upper_bound"));
-            LowerBound = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "lower_bound"));
+            TriggerBound = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "trigger_bound"));
             FrameCount = Int32.Parse(_iniReader.ReadValue(SECNAME_IMG, "framecount"));
             SaveFolder = _iniReader.ReadValue(SECNAME_IMG, "folder");
         }

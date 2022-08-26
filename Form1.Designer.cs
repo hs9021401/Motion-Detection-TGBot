@@ -44,6 +44,7 @@ namespace EMGU_Example
             this.btnRecoverSetting = new System.Windows.Forms.Button();
             this.btnApplySetting = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.btnBrowserFolder = new System.Windows.Forms.Button();
@@ -132,11 +133,13 @@ namespace EMGU_Example
             // lblDiff
             // 
             this.lblDiff.AutoSize = true;
+            this.lblDiff.Enabled = false;
             this.lblDiff.Location = new System.Drawing.Point(144, 498);
             this.lblDiff.Name = "lblDiff";
-            this.lblDiff.Size = new System.Drawing.Size(52, 12);
+            this.lblDiff.Size = new System.Drawing.Size(47, 12);
             this.lblDiff.TabIndex = 6;
-            this.lblDiff.Text = "閾值(%): ";
+            this.lblDiff.Text = "偵測值: ";
+            this.lblDiff.Visible = false;
             // 
             // label8
             // 
@@ -200,6 +203,7 @@ namespace EMGU_Example
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.label11);
             this.groupBox2.Controls.Add(this.label10);
             this.groupBox2.Controls.Add(this.label7);
             this.groupBox2.Controls.Add(this.btnBrowserFolder);
@@ -218,6 +222,17 @@ namespace EMGU_Example
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "影像相關";
             // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Font = new System.Drawing.Font("新細明體", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.label11.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.label11.Location = new System.Drawing.Point(170, 31);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(194, 12);
+            this.label11.TabIndex = 10;
+            this.label11.Text = "⚠ 建議5000以上, 若越低越容易觸發";
+            // 
             // label10
             // 
             this.label10.AutoSize = true;
@@ -232,11 +247,12 @@ namespace EMGU_Example
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(271, 29);
+            this.label7.Location = new System.Drawing.Point(517, 29);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(55, 12);
             this.label7.TabIndex = 9;
             this.label7.Text = "( 0 ~ 100 )";
+            this.label7.Visible = false;
             // 
             // btnBrowserFolder
             // 
@@ -283,20 +299,22 @@ namespace EMGU_Example
             // 
             // txtUpperBound
             // 
-            this.txtUpperBound.Location = new System.Drawing.Point(222, 21);
+            this.txtUpperBound.Location = new System.Drawing.Point(468, 21);
             this.txtUpperBound.Name = "txtUpperBound";
             this.txtUpperBound.Size = new System.Drawing.Size(43, 22);
             this.txtUpperBound.TabIndex = 3;
             this.txtUpperBound.Text = "100";
+            this.txtUpperBound.Visible = false;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(170, 29);
+            this.label4.Location = new System.Drawing.Point(416, 29);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(47, 12);
             this.label4.TabIndex = 2;
             this.label4.Text = "≦ 值 ≦";
+            this.label4.Visible = false;
             // 
             // txtLowerBound
             // 
@@ -304,16 +322,16 @@ namespace EMGU_Example
             this.txtLowerBound.Name = "txtLowerBound";
             this.txtLowerBound.Size = new System.Drawing.Size(48, 22);
             this.txtLowerBound.TabIndex = 1;
-            this.txtLowerBound.Text = "80";
+            this.txtLowerBound.Text = "5000";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(10, 29);
+            this.label3.Location = new System.Drawing.Point(58, 29);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(92, 12);
+            this.label3.Size = new System.Drawing.Size(44, 12);
             this.label3.TabIndex = 0;
-            this.label3.Text = "觸發閾值上下限:";
+            this.label3.Text = "觸發值:";
             // 
             // groupBox1
             // 
@@ -463,6 +481,7 @@ namespace EMGU_Example
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.LinkLabel linkBotCreateTutorial;
         private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label11;
     }
 }
 
